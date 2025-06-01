@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ôn thi trắc nghiệm</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2em;
+        background: #f5f5f5;
+        color: #333;
+      }
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+      }
+      .question {
+        background: #fff;
+        border-radius: 8px;
+        padding: 1em;
+        margin-bottom: 1em;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .question:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .question p {
+        font-weight: bold;
+        color: #34495e;
+        margin-bottom: 0.5em;
+      }
+      .answers label {
+        display: block;
+        margin: 0.3em 0 0.3em 1em;
+        cursor: pointer;
+      }
+      .result {
+        text-align: center;
+        font-size: 1.2em;
+        color: green;
+        font-weight: bold;
+        margin-top: 1em;
+      }
+      .error {
+        color: red;
+        margin-top: 0.5em;
+        font-size: 0.9em;
+      }
+      button {
+        margin: 1em;
+        padding: 0.5em 1em;
+        background: #2980b9;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      button:hover {
+        background: #3498db;
+      }
+      .pagination {
+        text-align: center;
+        margin-top: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Ôn thi trắc nghiệm</h1>
+
+    <div id="quiz-container"></div>
+
+    <div class="pagination">
+      <button onclick="prevPage()">Trang trước</button>
+      <button onclick="nextPage()">Trang sau</button>
+    </div>
+
+    <button onclick="submitQuiz()">Nộp bài</button>
+    <div class="result" id="result"></div>
+
+    <script>
+      const questions = [
+        {
+          question: "Câu 1: Thiết kế phần mềm là gì?",
+          options: {
+            a: "Quá trình viết mã nguồn",
+            b: "Quá trình xác định các thành phần phần mềm và mối liên kết giữa chúng dựa trên yêu cầu của khách hàng",
+            c: "Quá trình kiểm thử phần mềm",
+            d: "Quá trình bảo trì phần mềm",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 2: Hiện thực phần mềm là gì?",
+          options: {
+            a: "Quá trình kiểm thử phần mềm",
+            b: "Quá trình hiện thực hóa thiết kế thành chương trình",
+            c: "Quá trình viết tài liệu hướng dẫn",
+            d: "Quá trình bảo trì phần mềm",
+          },
+          answer: "b",
+        },
+        {
+          question:
+            "Câu 3: Thiết kế và hiện thực phần mềm là hai hoạt động như thế nào?",
+          options: {
+            a: "Tách biệt hoàn toàn",
+            b: "Đan xen lẫn nhau",
+            c: "Hoàn toàn độc lập",
+            d: "Không liên quan đến nhau",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 4: Thiết kế hướng đối tượng sử dụng gì để biểu diễn?",
+          options: {
+            a: "UML",
+            b: "SQL",
+            c: "HTML",
+            d: "XML",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 5: Thiết kế mẫu là gì?",
+          options: {
+            a: "Một phương pháp lập trình",
+            b: "Một phương pháp thiết kế giao diện người dùng",
+            c: "Một phương pháp để giải quyết các vấn đề thiết kế thường gặp",
+            d: "Một phương pháp kiểm thử phần mềm",
+          },
+          answer: "c",
+        },
+        {
+          question: "Câu 6: Phát triển mã nguồn mở liên quan đến gì?",
+          options: {
+            a: "Sử dụng phần mềm đóng gói",
+            b: "Sử dụng và phát triển các thành phần mã nguồn mở",
+            c: "Thiết kế giao diện người dùng",
+            d: "Quản lý dự án phần mềm",
+          },
+          answer: "b",
+        },
+        {
+          question:
+            "Câu 7: Một trong những nguyên tắc chính trong thiết kế giao diện người dùng là gì?",
+          options: {
+            a: "Tối ưu hóa cho các thiết bị di động",
+            b: "Tính đến nhu cầu, kinh nghiệm và khả năng của người dùng hệ thống",
+            c: "Tăng tốc độ phát triển phần mềm",
+            d: "Giảm chi phí phát triển",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 8: Thiết kế UI cần nhận thức được điều gì?",
+          options: {
+            a: "Các hạn chế về tài chính của dự án",
+            b: "Các hạn chế về vật lý và tinh thần của người dùng",
+            c: "Các công nghệ mới nhất",
+            d: "Các yêu cầu chức năng của hệ thống",
+          },
+          answer: "b",
+        },
+        {
+          question:
+            "Câu 9: Các mô hình thiết kế hệ thống có vai trò gì trong dự án lớn?",
+          options: {
+            a: "Giảm thời gian phát triển",
+            b: "Là cơ chế giao tiếp quan trọng giữa các nhóm thiết kế khác nhau",
+            c: "Tăng chi phí dự án",
+            d: "Giảm số lượng lỗi phần mềm",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 10: Thiết kế thuật toán là gì?",
+          options: {
+            a: "Quá trình thiết kế giao diện người dùng",
+            b: "Quá trình thiết kế các thuật toán để giải quyết các vấn đề cụ thể",
+            c: "Quá trình viết mã nguồn",
+            d: "Quá trình kiểm thử phần mềm",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 11: Thiết kế CSDL liên quan đến điều gì?",
+          options: {
+            a: "Thiết kế giao diện người dùng",
+            b: "Thiết kế cấu trúc và tổ chức của CSDL",
+            c: "Thiết kế các thuật toán",
+            d: "Kiểm thử CSDL",
+          },
+          answer: "b",
+        },
+        {
+          question:
+            "Câu 12: Trong thiết kế giao diện người dùng, cần thừa nhận điều gì?",
+          options: {
+            a: "Người dùng luôn biết cách sử dụng hệ thống",
+            b: "Ai cũng có thể nhầm lẫn",
+            c: "Hệ thống không bao giờ gặp lỗi",
+            d: "Giao diện không cần thân thiện",
+          },
+          answer: "b",
+        },
+        {
+          question:
+            "Câu 13: Mục tiêu chính của thiết kế giao diện người dùng là gì?",
+          options: {
+            a: "Tăng tốc độ phát triển phần mềm",
+            b: "Đáp ứng nhu cầu và trải nghiệm người dùng",
+            c: "Giảm chi phí phát triển",
+            d: "Tăng tính bảo mật của hệ thống",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 14: Quá trình thiết kế phần mềm bao gồm gì?",
+          options: {
+            a: "Viết mã nguồn",
+            b: "Định nghĩa các thành phần phần mềm và mối liên kết giữa chúng",
+            c: "Kiểm thử phần mềm",
+            d: "Bảo trì phần mềm",
+          },
+          answer: "b",
+        },
+        {
+          question:
+            "Câu 15: Một ví dụ về biểu đồ hoạt động trong thiết kế phần mềm là gì?",
+          options: {
+            a: "Biểu đồ lớp",
+            b: "Biểu đồ liên kết",
+            c: "Biểu đồ hoạt động swimming lane",
+            d: "Biểu đồ thành phần",
+          },
+          answer: "c",
+        },
+        {
+          question:
+            "Câu 16: Quản lý bản quyền trong thiết kế phần mềm liên quan đến điều gì?",
+          options: {
+            a: "Sử dụng các thành phần mã nguồn mở mà không cần kiểm tra",
+            b: "Duy trì thông tin về các thành phần mã nguồn mở đã tải về và sử dụng",
+            c: "Thiết kế giao diện người dùng",
+            d: "Bảo trì phần mềm",
+          },
+          answer: "b",
+        },
+        {
+          question:
+            "Câu 17: Một trong những nguyên tắc quan trọng trong thiết kế phần mềm là gì?",
+          options: {
+            a: "Giảm thiểu số lượng mã nguồn",
+            b: "Đảm bảo phần mềm dễ dàng bảo trì và mở rộng",
+            c: "Tăng số lượng thành phần phần mềm",
+            d: "Giảm thiểu tài liệu hướng dẫn",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 18: Thiết kế cơ sở dữ liệu bao gồm việc gì?",
+          options: {
+            a: "Xác định cấu trúc dữ liệu và cách tổ chức dữ liệu trong cơ sở dữ liệu",
+            b: "Viết mã nguồn",
+            c: "Thiết kế giao diện người dùng",
+            d: "Kiểm thử cơ sở dữ liệu",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 19: Thiết kế thuật toán có vai trò gì trong phần mềm?",
+          options: {
+            a: "Định nghĩa các giao diện người dùng",
+            b: "Giải quyết các vấn đề cụ thể bằng cách xác định các bước xử lý",
+            c: "Tăng tính phức tạp của mã nguồn",
+            d: "Bảo trì phần mềm",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 20: Mục đích của việc hiện thực phần mềm là gì?",
+          options: {
+            a: "Đáp ứng các yêu cầu thiết kế chi tiết",
+            b: "Thỏa mãn người dùng cuối",
+            c: "Tăng tính phức tạp của mã nguồn",
+            d: "Giảm chi phí phát triển",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 21: Unit Implementation được hiểu là gì?",
+          options: {
+            a: "Lập trình các đơn vị phần mềm nhỏ nhất",
+            b: "Thiết kế giao diện người dùng",
+            c: "Tạo lập các tài liệu hướng dẫn sử dụng",
+            d: "Kiểm tra và bảo trì phần mềm",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 22: Một quy tắc vàng trong hiện thực phần mềm là gì?",
+          options: {
+            a: "Kiểm tra các yêu cầu và thiết kế lại một lần nữa",
+            b: "Không cần kiểm tra lại thiết kế sau khi mã hóa",
+            c: "Tập trung vào việc lập trình nhanh chóng",
+            d: "Đơn giản hóa tất cả các quy trình",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 23: Tại sao cần xác nhận các thiết kế chi tiết trước khi hiện thực?",
+          options: {
+            a: "Để đảm bảo các thiết kế đáp ứng yêu cầu của người dùng",
+            b: "Để giảm chi phí phát triển",
+            c: "Để tiết kiệm thời gian kiểm thử",
+            d: "Để tăng tốc độ mã hóa",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 24: Mục đích của việc ghi lại lỗi khi sử dụng form là gì?",
+          options: {
+            a: "Để theo dõi và sửa chữa lỗi một cách hệ thống",
+            b: "Để lưu trữ dữ liệu người dùng",
+            c: "Để tăng tốc độ phát triển phần mềm",
+            d: "Để phân tích thị trường",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 25: Tiêu chuẩn yêu cầu đối với việc mã hóa bao gồm gì?",
+          options: {
+            a: "Tính đúng đắn và rõ ràng",
+            b: "Tính linh hoạt và tiết kiệm",
+            c: "Tính đơn giản và nhanh chóng",
+            d: "Tính bảo mật và khả năng mở rộng",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 26: Ước lượng kích thước và thời gian dựa trên gì?",
+          options: {
+            a: "Dữ liệu đã có",
+            b: "Kinh nghiệm cá nhân",
+            c: "Yêu cầu khách hàng",
+            d: "Ngân sách dự án",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 27: Hiện thực mã chương trình bao gồm bước nào sau đây?",
+          options: {
+            a: "Lập kế hoạch cấu trúc và thiết kế mã",
+            b: "Thiết kế giao diện người dùng",
+            c: "Viết tài liệu hướng dẫn",
+            d: "Ngân sách dự án",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 28: Tại sao cần tự kiểm tra lại thiết kế cấu trúc trước khi mã hóa?",
+          options: {
+            a: "Để đảm bảo tính đúng đắn và hiệu quả của mã nguồn",
+            b: "Để tăng tốc độ mã hóa",
+            c: "Để giảm chi phí phát triển",
+            d: "Để làm hài lòng khách hàng",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 29: Quy tắc đặt tên trong hiện thực mã chương trình cần tuân thủ những gì?",
+          options: {
+            a: "Phù hợp và rõ ràng",
+            b: "Ngắn gọn và xúc tích",
+            c: "Phức tạp và chi tiết",
+            d: "Bất kỳ tên nào cũng được",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 30: Kiểm tra Class cần xem xét điều gì?",
+          options: {
+            a: "Tên Class có thích hợp không",
+            b: "Class có được trừu tượng không",
+            c: "Header của Class có mô tả mục đích của hàm hay không",
+            d: "Tất cả các ý trên",
+          },
+          answer: "d",
+        },
+        {
+          question: "Câu 31: Kiểm tra thuộc tính cần xác định điều gì?",
+          options: {
+            a: "Thuộc tính có cần thiết hay không",
+            b: "Thuộc tính có thể là static hay không",
+            c: "Thuộc tính có thể là final hay không",
+            d: "Tất cả các ý trên",
+          },
+          answer: "d",
+        },
+        {
+          question:
+            "Câu 32: Phương pháp kiểm tra phương thức khởi dựng cần xác định điều gì?",
+          options: {
+            a: "Phương thức có cần thiết không",
+            b: "Phương thức có leverage các constructor hiện có không",
+            c: "Phương thức có initialize tất cả các thuộc tính không",
+            d: "Tất cả các ý trên",
+          },
+          answer: "d",
+        },
+        {
+          question: "Câu 33: Làm thế nào để lập trình 1000 LoC/ngày?",
+          options: {
+            a: "Lập kế hoạch cấu trúc và thiết kế mã chương trình",
+            b: "Tăng tốc độ đánh máy",
+            c: "Tập trung vào các yêu cầu của khách hàng",
+            d: "Giảm thời gian kiểm tra mã",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 34: Kiểm tra thuộc tính có cần xác định điều gì?",
+          options: {
+            a: "Sự cần thiết của thuộc tính",
+            b: "Thuộc tính có thể là static hay không",
+            c: "Thuộc tính có nên là final hay không",
+            d: "Tất cả các ý trên",
+          },
+          answer: "d",
+        },
+        {
+          question:
+            "Câu 35: Tại sao cần ghi lại các mốc thời gian trong quá trình thực hiện mã chương trình?",
+          options: {
+            a: "Để theo dõi tiến độ và quản lý thời gian hiệu quả",
+            b: "Để lưu trữ dữ liệu người dùng",
+            c: "Để phân tích thị trường",
+            d: "Để giảm chi phí phát triển",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 36: Việc chuẩn bị để hiện thực bao gồm gì?",
+          options: {
+            a: "Xác nhận các thiết kế chi tiết phải thực hiện",
+            b: "Mã hóa từ một thiết kế được mô tả bằng văn bản",
+            c: "Đo thời gian phân loại theo các bước",
+            d: "Tất cả các ý trên",
+          },
+          answer: "d",
+        },
+        {
+          question: "Câu 37: Mục đích của việc biên dịch mã lệnh là gì?",
+          options: {
+            a: "Kiểm tra và sửa chữa các lỗi cú pháp",
+            b: "Thiết kế giao diện người đứng",
+            c: "Viết tài liệu hướng dẫn",
+            d: "Tạo lập báo cáo phân tích",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 38: Mục tiêu của kiểm thử phần mềm là?",
+          options: {
+            a: "Để chỉ ra rằng chương trình thực hiện đúng như mong đợi và tìm ra lỗi",
+            b: "Để giảm chi phí phát triển",
+            c: "Để tăng tốc độ lập trình",
+            d: "Để làm hài lòng khách hàng",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 39: Kiểm thử đơn vị(unit test) tập trung vào điều gì?",
+          options: {
+            a: "Kiểm thử chức năng của các đối tượng hay các phương thức",
+            b: "Kiểm thử giao diện người dùng",
+            c: "Kiểm thử hiệu suất hệ thống",
+            d: "Kiểm thử tính bảo mật",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 40: Kiểm thử component (component testing) tập trung vào điều gì?",
+          options: {
+            a: "Kiểm thử giao diện component",
+            b: "Kiểm thử chức năng của các phương thức",
+            c: "Kiểm thử tính bảo mật",
+            d: "Kiểm thử giao diện người dùng",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 41: Kiểm thử hệ thống (system testing) tập trung vào điều gì?",
+          options: {
+            a: "Kiểm thử tương tác giữa các component",
+            b: "Kiểm thử giao diện người dùng",
+            c: "Kiểm thử tính bảo mật",
+            d: "Kiểm thử hiệu suất hệ thống",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 42: Kiểm thử tự động nên sử dụng gì để hỗ trợ kiểm thử đơn vị?",
+          options: {
+            a: "Framework kiểm thử tự động (như JUnit)",
+            b: "Các công cụ kiểm thử thủ công",
+            c: "Phần mềm thiết kế giao diện",
+            d: "Các chương trình bảo mật",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 43: Mục tiêu của kiểm thử giao diện là gì?",
+          options: {
+            a: "Tìm ra lỗi gây ra bởi các lỗi giao diện hoặc giả định sai về các giao diện",
+            b: "Kiểm thử chức năng của các phương thức",
+            c: "Kiểm thử hiệu suất hệ thống",
+            d: "Kiểm thử tính bảo mật",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 44: Một loại giao diện trong kiểm thử giao diện là gì?",
+          options: {
+            a: "Giao diện có tham số",
+            b: "Giao diện người dùng",
+            c: "Giao diện hệ thống",
+            d: "Giao diện bảo mật",
+          },
+          answer: "b",
+        },
+        {
+          question: "Câu 45: Kiểm thử phát triển là trách nhiệm của ai?",
+          options: {
+            a: "Đội ngũ phát triển phần mềm",
+            b: "Người dùng cuối",
+            c: "Nhóm marketing",
+            d: "Nhóm hỗ trợ khách hàng",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 46: Kiểm thử phát hành là gì?",
+          options: {
+            a: "Kiểm thử hệ thống trước khi phát hành cho khách hàng",
+            b: "Kiểm thử hệ thống sau khi phát hành cho khách hàng",
+            c: "Kiểm thử hệ thống trong giai đoạn phát triển",
+            d: "Kiểm thử hệ thống trong giai đoạn bảo trì",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 47: Phương thức kiểm thử hộp đen tập trung vào điều gì?",
+          options: {
+            a: "Kiểm thử chức năng hệ thống mà không cần biết cấu trúc bên trong",
+            b: "Kiểm thử hiệu suất hệ thống",
+            c: "Kiểm thử tính bảo mật",
+            d: "Kiểm thử giao diện người dùng",
+          },
+          answer: "a",
+        },
+        {
+          question:
+            "Câu 48: Phương pháp kiểm thử hộp trắng tập trung vào điều gì?",
+          options: {
+            a: "Kiểm thử cấu trúc bên trong của hệ thống",
+            b: "Kiểm thử hiệu suất hệ thống",
+            c: "Kiểm thử tính bảo mật",
+            d: "Kiểm thử giao diện người dùng",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 49: Phương pháp kiểm thử hộp xám là gì?",
+          options: {
+            a: "Kết hợp giữa kiểm thử hộp đen và kiểm thử hộp trắng",
+            b: "Kiểm thử hiệu suất hệ thống",
+            c: "Kiểm thử tính bảo mật",
+            d: "Kiểm thử giao diện người dùng",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 50: Mục tiêu của kiểm thử validation là gì?",
+          options: {
+            a: "Để chỉ ra rằng phần mềm thỏa mãn các yêu cầu đưa ra",
+            b: "Để tìm ra các lỗi của phần mềm",
+            c: "Để giảm chi phí phát triển",
+            d: "Để tăng tốc độ lập trình",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 51: Mục tiêu của kiểm thử defect là gì?",
+          options: {
+            a: "Để tìm ra các tình huống mà phần mềm hoạt động không đúng như mong đợi",
+            b: "Để chỉ ra rằng phần mềm thỏa mãn các yêu cầu đưa ra",
+            c: "Để giảm chi phí phát triển",
+            d: "Để làm hài lòng khách hàng",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 52: Tại sao cần kiểm tra kết quả của việc kiểm thử?",
+          options: {
+            a: "Để tìm ra lỗi và các bất thường",
+            b: "Để lưu trữ dữ liệu người dùng",
+            c: "Để phân tích thị trường",
+            d: "Để tăng tốc độ phát triển phần mềm",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 53: Kiểm thử người dùng tập trung vào điều gì?",
+          options: {
+            a: "Kiểm thử phần mềm bởi người dùng cuối",
+            b: "Kiểm thử tính bảo mật",
+            c: "Kiểm thử hiệu suất hệ thống",
+            d: "Kiểm thử giao diện người dùng",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 54: Cải tiến quy trình phần mềm bao gồm gì?",
+          options: {
+            a: "Cải tiến các phương pháp phát triển và kiểm thử phần mềm",
+            b: "Tăng tốc độ lập trình",
+            c: "Giảm chi phí phát triển",
+            d: "Tập trung vào giao diện người dùng",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 55: Bảo trì phần mềm bao gồm những gì?",
+          options: {
+            a: "Sửa lỗi và nâng cấp phần mềm sau khi phát hành",
+            b: "Thiết kế giao diện người dùng",
+            c: "Viết tài liệu hướng dẫn",
+            d: "Tạo lập báo cáo",
+          },
+          answer: "a",
+        },
+        {
+          question: "Câu 56: Mục đích của việc kiểm thử release là gì?",
+          options: {
+            a: "Để đảm bảo phần mềm hoạt động đúng như mong đợi trước khi phát hành",
+            b: "Để giảm chi phí phát triển",
+            c: "Để tăng tốc độ lập trình",
+            d: "Để làm hài lòng khách hàng",
+          },
+          answer: "a",
+        },
+      ];
+
+      const questionsPerPage = 10;
+      let currentPage = 1;
+
+      function renderPage(page) {
+        const container = document.getElementById("quiz-container");
+        container.innerHTML = "";
+        const start = (page - 1) * questionsPerPage;
+        const end = start + questionsPerPage;
+        questions.slice(start, end).forEach((q, idx) => {
+          const qDiv = document.createElement("div");
+          qDiv.classList.add("question");
+          qDiv.innerHTML = `<p>${
+            q.question
+          }</p><div class="answers"></div><div class="error" id="error-${
+            start + idx
+          }"></div>`;
+          const answersDiv = qDiv.querySelector(".answers");
+          Object.entries(q.options).forEach(([key, text]) => {
+            const label = document.createElement("label");
+            label.innerHTML = `<input type="radio" name="q${
+              start + idx
+            }" value="${key}">${text}`;
+            answersDiv.appendChild(label);
+          });
+          container.appendChild(qDiv);
+        });
+      }
+
+      function prevPage() {
+        if (currentPage > 1) {
+          currentPage--;
+          renderPage(currentPage);
+        }
+      }
+
+      function nextPage() {
+        if (currentPage < Math.ceil(questions.length / questionsPerPage)) {
+          currentPage++;
+          renderPage(currentPage);
+        }
+      }
+
+      function submitQuiz() {
+        let score = 0;
+        questions.forEach((q, idx) => {
+          const selected = document.querySelector(
+            `input[name="q${idx}"]:checked`
+          );
+          const errorDiv = document.getElementById(`error-${idx}`);
+          if (selected) {
+            if (selected.value === q.answer) {
+              score++;
+              if (errorDiv) errorDiv.textContent = "";
+            } else {
+              if (errorDiv)
+                errorDiv.textContent =
+                  "Sai! Đáp án đúng: " + q.options[q.answer];
+            }
+          } else {
+            if (errorDiv) errorDiv.textContent = "Bạn chưa chọn!";
+          }
+        });
+        document.getElementById(
+          "result"
+        ).textContent = `🎉 Bạn trả lời đúng ${score}/${questions.length} câu!`;
+      }
+
+      renderPage(currentPage);
+    </script>
+  </body>
+</html>
